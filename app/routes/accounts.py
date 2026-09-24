@@ -42,3 +42,39 @@ def get_positions(account_id: str, conn: sqlite3.Connection = Depends(get_conn))
             }
         )
     return {"account_id": account_id, "positions": result}
+
+
+@router.get("/accounts/{account_id}/transactions")
+def get_transactions(
+    account_id: str,
+    conn: sqlite3.Connection = Depends(get_conn),
+):
+    account = conn.execute(
+        "SELECT 1 FROM accounts WHERE id = ?",
+        (account_id,),
+    ).fetchone()
+
+    if account is None:
+        raise HTTPException(status_code=404, detail="account not found")
+
+    rows = conn.execute(
+        """
+        SELECT id, type, amount, created_at
+        FROM transactions
+        WHERE account_id = ?
+        ORDER BY created_at DESC, id DESC
+        """,
+        (account_id,),
+    ).fetchall()
+
+    items = [
+        {
+            "id": row["id"],
+            "type": row["type"],
+            "amount": f"{row['amount']:.2f}",
+            "created_at": row["created_at"],
+        }
+        for row in rows
+    ]
+
+    return {"items": items, "next_cursor": None}
