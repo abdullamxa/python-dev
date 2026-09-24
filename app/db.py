@@ -38,6 +38,15 @@ CREATE TABLE IF NOT EXISTS transactions (
     created_at TEXT NOT NULL,
     transfer_id TEXT REFERENCES transfers(id)
 );
+CREATE TABLE IF NOT EXISTS transfer_idempotency (
+    key TEXT PRIMARY KEY,
+    from_account TEXT NOT NULL,
+    to_account TEXT NOT NULL,
+    amount TEXT NOT NULL,
+    transfer_id TEXT NOT NULL REFERENCES transfers(id),
+    from_balance TEXT NOT NULL,
+    to_balance TEXT NOT NULL
+);
 """
 
 
