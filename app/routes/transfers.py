@@ -21,6 +21,11 @@ def create_transfer(
     amount = req.amount.quantize(Decimal("0.01"))
 
     # Lock before checking the key or reading balances.
+    if req.from_account == req.to_account:
+        raise HTTPException(
+            status_code=422,
+            detail="source and destination accounts must differ",
+        )
     conn.execute("BEGIN IMMEDIATE")
 
     try:

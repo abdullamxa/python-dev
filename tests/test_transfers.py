@@ -31,3 +31,10 @@ def test_transfer_idempotency_key(client):
     assert first.status_code == 201
     assert second.json()["transfer_id"] == first.json()["transfer_id"]
     assert client.get("/accounts/ACC-1001").json()["balance"] == "900.00"
+
+
+def test_transfer_to_same_account_is_rejected(client):
+    response = _transfer(client, 100, src="ACC-1001", dst="ACC-1001")
+
+    assert response.status_code == 422
+    assert client.get("/accounts/ACC-1001").json()["balance"] == "1000.00"
