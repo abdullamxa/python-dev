@@ -38,3 +38,13 @@ def test_transfer_to_same_account_is_rejected(client):
 
     assert response.status_code == 422
     assert client.get("/accounts/ACC-1001").json()["balance"] == "1000.00"
+
+
+def test_transfer_rejects_invalid_amounts(client):
+    for amount in (0, -10, 0.001):
+        response = _transfer(client, amount)
+        assert response.status_code == 422
+
+    assert client.get("/accounts/ACC-1001").json()["balance"] == "1000.00"
+    assert client.get("/accounts/ACC-1002").json()["balance"] == "500.00"
+
