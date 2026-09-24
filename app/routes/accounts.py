@@ -14,7 +14,7 @@ def get_account(account_id: str, conn: sqlite3.Connection = Depends(get_conn)):
     ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="account not found")
-    return {"id": row["id"], "client_name": row["client_name"], "balance": str(row["balance"])}
+    return {"id": row["id"], "client_name": row["client_name"], "balance": f"{row['balance']:.2f}"}
 
 
 @router.get("/accounts/{account_id}/positions")
